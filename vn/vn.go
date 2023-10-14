@@ -19,7 +19,7 @@ const (
 )
 
 func IDVerify(idStr string) *errors.Error {
-	matched, _ := regexp.MatchString("^[a-zA-Z0-9]+$", idStr)
+	matched, _ := regexp.MatchString("^[a-zA-Z0-9]{1,108}$", idStr)
 	if !matched {
 		return errors.Verify(fmt.Sprintf("invalid vn id: %s", idStr))
 	}
