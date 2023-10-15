@@ -10,6 +10,10 @@ import (
 
 type ID string
 
+const (
+	HOTU ID = "HOTU"
+)
+
 func (id ID) S() string {
 	return string(id)
 }
