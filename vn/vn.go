@@ -40,7 +40,7 @@ func IDOf(idStr string) (ID, *errors.Error) {
 
 type VN struct {
 	ID         string `bson:"id" json:"id"`
-	Originator ki.PUB `bson:"originator" json:"originator"`
-	Guardian   ki.PUB `bson:"guardian" json:"guardian"`
+	Originator ki.ADR `bson:"originator" json:"originator"`
+	Guardian   ki.ADR `bson:"guardian" json:"guardian"`
 	Dob        int64  `bson:"dob" json:"dob"` //date of birth
 }

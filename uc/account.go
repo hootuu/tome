@@ -5,16 +5,21 @@ import (
 	"github.com/hootuu/tome/yn"
 )
 
-type AccountID = ki.ADR
+type AccountOwner = ki.ADR
 
 const (
-	ISSUER AccountID = "$"
+	ISSUER AccountOwner = "$"
 )
 
+type AccountLead struct {
+	Owner AccountOwner `bson:"owner" json:"owner"`
+	Coin  Code         `bson:"coin" json:"coin"`
+}
+
 type Account struct {
-	ID      AccountID `bson:"id" json:"id"`
-	Coin    Code      `bson:"code" json:"code"`
-	Balance int64     `bson:"balance" json:"balance"`
+	Owner   AccountOwner `bson:"owner" json:"owner"`
+	Coin    Code         `bson:"code" json:"code"`
+	Balance *Amount      `bson:"balance" json:"balance"`
 }
 
 type AlterID string
@@ -23,11 +28,19 @@ func (a AlterID) S() string {
 	return string(a)
 }
 
+type AlterType string
+
+const (
+	INC AlterType = "+"
+	DEC AlterType = "-"
+)
+
 type Alter struct {
-	ID        AlterID   `bson:"id" json:"id"`
-	AccountID AccountID `bson:"account_id" json:"account_id"`
-	Side      AccountID `bson:"side" json:"side"`
-	Coin      Code      `bson:"coin" json:"coin"`
-	Amount    int64     `bson:"amount" json:"amount"`
-	Yin       yn.YID    `bson:"yin" json:"yin"`
+	ID           AlterID      `bson:"id" json:"id"`
+	AlterType    AlterType    `bson:"alter_type" json:"alter_type"`
+	AccountOwner AccountOwner `bson:"account_owner" json:"account_owner"`
+	Side         AccountOwner `bson:"side" json:"side"`
+	Coin         Code         `bson:"coin" json:"coin"`
+	Amount       *Amount      `bson:"amount" json:"amount"`
+	Yin          yn.YID       `bson:"yin" json:"yin"`
 }
