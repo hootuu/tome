@@ -60,7 +60,7 @@ func Include(arr []*FQ, fq Code) bool {
 		return false
 	}
 	for _, f := range arr {
-		if f.Fq == fq {
+		if strings.ToUpper(f.Fq.S()) == strings.ToUpper(fq.S()) {
 			return true
 		}
 	}

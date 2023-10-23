@@ -22,3 +22,5 @@ go.work
 
 # Goland
 .idea
+/go.sum
+/main.go

@@ -1,6 +1,7 @@
 package yn
 
 import (
+	"fmt"
 	"github.com/hootuu/tome/bk"
 	"github.com/hootuu/tome/sp"
 	"github.com/hootuu/tome/vn"
@@ -148,4 +149,16 @@ func (y *Yin) Verify() *errors.Error {
 		})
 	}
 	return nil
+}
+
+func (y *Yin) Digest() string {
+	return fmt.Sprintf("[%s:%s][%s] %s %s %s EXP %d #%s#",
+		y.Vn.S(),
+		y.Sp.S(),
+		y.When.Time().Format("2006-01-02 15:04:05"),
+		y.Who.Who,
+		y.Act.S(),
+		y.What.Code,
+		y.Exp.Amount,
+		y.Title)
 }

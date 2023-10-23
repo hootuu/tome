@@ -26,8 +26,8 @@ func NewAmount(wei WEI, left int64, right int64) (*Amount, *errors.Error) {
 		return nil, errors.Verify("wei must be (0, 10]")
 	}
 	rightStr := fmt.Sprintf("%d", right)
-	if len(rightStr) > int(MaxWei) {
-		rightStr = rightStr[:MaxWei]
+	if len(rightStr) > int(wei) {
+		rightStr = rightStr[:wei]
 	}
 	rightVal, _ := strconv.ParseInt(rightStr, 10, 64)
 	return &Amount{
@@ -50,11 +50,11 @@ func NewAmountFloat64(wei WEI, fVal float64) (*Amount, *errors.Error) {
 	}
 	rightPartStr := parts[1]
 	var rightVal int64 = 0
-	if len(rightPartStr) > int(MaxWei) {
-		rightPartStr = rightPartStr[:MaxWei]
+	if len(rightPartStr) > int(wei) {
+		rightPartStr = rightPartStr[:wei]
 	} else {
-		if len(rightPartStr) < int(MaxWei) {
-			for i := len(rightPartStr); i < int(MaxWei); i++ {
+		if len(rightPartStr) < int(wei) {
+			for i := len(rightPartStr); i < int(wei); i++ {
 				rightPartStr += "0"
 			}
 		}
@@ -92,44 +92,6 @@ func (a *Amount) Inc(incAmount *Amount) *Amount {
 	return pureIncAmount
 }
 
-//func (a *Amount) IncFloat64(fVal float64) *Amount {
-//	str := fmt.Sprintf("%f", fVal)
-//	fmt.Println(str)
-//	lr := strings.Split(str, ".")
-//	fmt.Println(lr)
-//	leftStr := lr[0]
-//	rightStr := lr[1]
-//	if len(rightStr) < int(a.Wei) {
-//		for i := len(rightStr); i < int(a.Wei); i++ {
-//			rightStr += "0"
-//		}
-//	}
-//	leftIncVal, _ := strconv.ParseInt(leftStr, 10, 64)
-//	rightIncVal, _ := strconv.ParseInt(rightStr, 10, 64)
-//	fmt.Println("left inc val", leftIncVal)
-//	fmt.Println("right inc val", rightIncVal)
-//	originLeft := a.Left
-//	originRight := a.Right
-//	willLeft := originLeft + leftIncVal
-//	willRight := originRight + rightIncVal
-//	fmt.Println("willLeft:", willLeft)
-//	fmt.Println("willRight:", willRight)
-//	willRightStr := fmt.Sprintf("%d", willRight)
-//	if len(willRightStr) > int(a.Wei) {
-//		willLeft += 1
-//		willRight, _ = strconv.ParseInt(willRightStr[1:], 10, 64)
-//	}
-//	leftInc := willLeft - a.Left
-//	rightInc := willRight - a.Right
-//	a.Left = willLeft
-//	a.Right = willRight
-//	return &Amount{
-//		Wei:   a.Wei,
-//		Left:  leftInc,
-//		Right: rightInc,
-//	}
-//}
-
 func (a *Amount) Lte(b *Amount) bool {
 	if a.Left > b.Left {
 		return false
@@ -162,10 +124,26 @@ func (a *Amount) String() string {
 	if a.Right == 0 {
 		return fmt.Sprintf("%d", a.Left)
 	}
-	return fmt.Sprintf("%d.%d", a.Left, a.Right)
+	rightStr := fmt.Sprintf("%d", a.Right)
+	rightLength := len(rightStr)
+	padding := ""
+	if rightLength < int(a.Wei) {
+		for i := rightLength; i < int(a.Wei); i++ {
+			padding += "0"
+		}
+	}
+	return fmt.Sprintf("%d.%s%d", a.Left, padding, a.Right)
 }
 
 func (a *Amount) getRightFirstDigit() int64 {
+	if a.Right == 0 {
+		return 0
+	}
+	rightStr := fmt.Sprintf("%d", a.Right)
+	rightLength := len(rightStr)
+	if rightLength < int(a.Wei) {
+		return 0
+	}
 	n := a.Right
 	for n >= 10 {
 		n /= 10
