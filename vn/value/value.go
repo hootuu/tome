@@ -17,6 +17,17 @@ const (
 	NilKey Key = ""
 )
 
+const (
+	KeyGMV              Key = "GMV"
+	KeyOrders           Key = "ORDERS"
+	KeyOrderUsers       Key = "ORDER_USERS"
+	KeyPCT              Key = "PCT" //per customer transaction
+	KeyDailyGMV         Key = "GMV_DAILY"
+	KeyDailyOrders      Key = "ORDER_DAILY"
+	KeyDailyPCT         Key = "PCT_DAILY"
+	KeyDailyActiveUsers Key = "AU_DAILY"
+)
+
 func KeyVerify(keyStr string) *errors.Error {
 	matched, _ := regexp.MatchString("^[a-zA-Z0-9_\\.]{1,108}$", keyStr)
 	if !matched {
