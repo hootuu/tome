@@ -12,7 +12,7 @@ type Ref struct {
 }
 
 func RefOf(codeStr string, refStr string) (*Ref, *errors.Error) {
-	codeMatched, _ := regexp.MatchString("^[a-zA-Z0-9]{3,60}$", codeStr)
+	codeMatched, _ := regexp.MatchString("^[a-zA-Z0-9\\._]{3,60}$", codeStr)
 	if !codeMatched {
 		return nil, errors.Verify("invalid ref.code: ^[a-zA-Z0-9]{3,60}$")
 	}
