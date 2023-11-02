@@ -2,6 +2,7 @@ package bk
 
 import (
 	"fmt"
+	"github.com/hootuu/tome/vn"
 	"github.com/hootuu/utils/errors"
 )
 
@@ -28,9 +29,20 @@ const (
 	KnotVersion      = DefaultVersion
 )
 
+func BuildGenesis() Invariable {
+	return &InvariableTemplate{
+		Type:      "",
+		Version:   0,
+		Vn:        "",
+		Timestamp: 0,
+		Signature: nil,
+	}
+}
+
 type Knot struct {
 	Type       Type            `json:"type"`
 	Version    Version         `json:"version"`
+	Vn         vn.ID           `json:"vn"`
 	Chain      Chain           `json:"chain"`
 	Knot       KnotIDX         `json:"knot"`
 	Invariable *InvariableLead `json:"invariable"`
@@ -39,24 +51,16 @@ type Knot struct {
 	Signature  []byte          `json:"signature"`
 }
 
-func NewKnot(rope Rope, invariable Invariable) (*Knot, *errors.Error) {
-	invariableBID, err := BuildBID(invariable)
-	if err != nil {
-		return nil, err
-	}
+func NewKnot(rope Rope, tie *Tie) (*Knot, *errors.Error) {
 	link := &Knot{
-		Type:    KnotType,
-		Version: KnotVersion,
-		Chain:   rope.GetChain(),
-		Knot:    rope.GetTailKnot().Next(),
-		Invariable: &InvariableLead{
-			Type:       invariable.GetType(),
-			Version:    invariable.GetVersion(),
-			Invariable: invariableBID,
-		},
-		Previous:  rope.GetTailInvariable(),
-		Timestamp: invariable.GetTimestamp(),
-		Signature: invariable.GetSignature(),
+		Type:       KnotType,
+		Version:    KnotVersion,
+		Chain:      rope.GetChain(),
+		Knot:       rope.GetTailKnotIDX().Next(),
+		Invariable: tie.Invariable,
+		Previous:   rope.GetTailKnotBID(),
+		Timestamp:  tie.Timestamp,
+		Signature:  tie.Signature,
 	}
 	return link, nil
 }
@@ -67,6 +71,10 @@ func (k *Knot) GetType() Type {
 
 func (k *Knot) GetVersion() Version {
 	return k.Version
+}
+
+func (k *Knot) GetVN() vn.ID {
+	return k.Vn
 }
 
 func (k *Knot) GetChain() Chain {
