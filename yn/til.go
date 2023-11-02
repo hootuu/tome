@@ -10,6 +10,10 @@ const (
 	NilTitle Title = ""
 )
 
+func (t Title) S() string {
+	return string(t)
+}
+
 func TitleVerify(tilStr string) *errors.Error {
 	length := len(tilStr)
 	if length == 0 || length > 360 {

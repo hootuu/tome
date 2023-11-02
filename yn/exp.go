@@ -1,6 +1,7 @@
 package yn
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/hootuu/utils/errors"
 	"regexp"
@@ -52,6 +53,11 @@ func NewExpense(currencyStr string, amount int64) (*Expense, *errors.Error) {
 		Currency: currency,
 		Ex:       nil,
 	}, nil
+}
+
+func (exp *Expense) S() string {
+	jsonByte, _ := json.Marshal(exp)
+	return string(jsonByte)
 }
 
 func (exp *Expense) PutEx(code string, exExp *ExpenseItem) {

@@ -11,3 +11,7 @@ func NewWhat(codeStr string, refStr string) (*What, *errors.Error) {
 	}
 	return (*What)(ref), nil
 }
+
+func (what *What) S() string {
+	return what.S()
+}

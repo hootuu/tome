@@ -11,6 +11,7 @@ import (
 type YID = bk.BID
 
 type Yin struct {
+	Yin   Code     `bson:"yin" json:"yin"`
 	Vn    vn.ID    `bson:"vn" json:"vn" cbor:"vn"`
 	Sp    sp.ID    `bson:"sp" json:"sp" cbor:"sp"`
 	Who   *Who     `bson:"who" json:"who"`

@@ -6,15 +6,11 @@ import (
 	"strings"
 )
 
-type Tag string
+type Tag = string
 
 const (
 	NilTag Tag = ""
 )
-
-func (t Tag) S() string {
-	return string(t)
-}
 
 func TagOf(tagStr string) (Tag, *errors.Error) {
 	matched, _ := regexp.MatchString("^[a-zA-Z0-9]{2,60}$", tagStr)

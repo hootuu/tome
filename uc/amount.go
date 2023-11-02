@@ -10,6 +10,10 @@ import (
 
 type WEI int8
 
+func (wei WEI) S() string {
+	return fmt.Sprintf("%d", wei)
+}
+
 const (
 	MaxWei     WEI = 16
 	DefaultWei WEI = 10
@@ -19,6 +23,10 @@ type Amount struct {
 	Wei   WEI   `bson:"wei" json:"wei"`
 	Left  int64 `bson:"left" json:"left"`
 	Right int64 `bson:"right" json:"right"`
+}
+
+func (a *Amount) S() string {
+	return fmt.Sprintf("wei=%d;left=%d;right=%d;", a.Wei, a.Left, a.Right)
 }
 
 func NewAmount(wei WEI, left int64, right int64) (*Amount, *errors.Error) {

@@ -11,10 +11,14 @@ type Ref struct {
 	Ref  string `bson:"ref" json:"ref"`
 }
 
+func (ref *Ref) S() string {
+	return ref.Ref + "@" + ref.Code
+}
+
 func RefOf(codeStr string, refStr string) (*Ref, *errors.Error) {
-	codeMatched, _ := regexp.MatchString("^[a-zA-Z0-9\\._]{3,60}$", codeStr)
+	codeMatched, _ := regexp.MatchString(`^[a-zA-Z0-9._]{3,100}$`, codeStr)
 	if !codeMatched {
-		return nil, errors.Verify("invalid ref.code: ^[a-zA-Z0-9]{3,60}$")
+		return nil, errors.Verify("invalid ref.code: [a-zA-Z0-9._]{3,100}$")
 	}
 	refLen := len(refStr)
 	if refLen == 0 || refLen > 360 {

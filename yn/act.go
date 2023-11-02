@@ -18,7 +18,7 @@ func (a Act) S() string {
 }
 
 func ActVerify(actStr string) *errors.Error {
-	matched, _ := regexp.MatchString("^[a-zA-Z0-9\\._]{3,60}$", actStr)
+	matched, _ := regexp.MatchString(`^[a-zA-Z0-9._]{3,100}$`, actStr)
 	if !matched {
 		return errors.Verify(fmt.Sprintf("invalid currency: %s", actStr))
 	}

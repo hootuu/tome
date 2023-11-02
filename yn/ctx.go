@@ -1,6 +1,9 @@
 package yn
 
-import "github.com/hootuu/utils/errors"
+import (
+	"encoding/json"
+	"github.com/hootuu/utils/errors"
+)
 
 type Ctx map[string]string
 
@@ -19,4 +22,19 @@ func (c Ctx) Put(code string, val string) *errors.Error {
 	}
 	c[code] = val
 	return nil
+}
+
+func CtxToData(c Ctx) ([]byte, *errors.Error) {
+	if len(c) == 0 {
+		c = NewCtx()
+		c.Put("hotu", "I USE HOTU TO BUILD MY VALUABLE BUSINESS NETWORK")
+	}
+	b, nErr := json.Marshal(c)
+	if nErr != nil {
+		return nil, errors.Verify("invalid ctx")
+	}
+	if len(b) > 10240 {
+		return nil, errors.Verify("invalid ctx, too big.")
+	}
+	return b, nil
 }

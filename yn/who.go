@@ -24,3 +24,7 @@ func NewWho(whoStr string, refCode string, refRef string) (*Who, *errors.Error) 
 		Ref: ref,
 	}, nil
 }
+
+func (who *Who) S() string {
+	return who.Who.S() + ":" + who.Ref.S()
+}

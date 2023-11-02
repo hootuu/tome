@@ -17,7 +17,8 @@ func (id ID) S() string {
 }
 
 const (
-	NilID ID = ""
+	NilID  ID = ""
+	RootID ID = "$"
 )
 
 func IDVerify(idStr string) *errors.Error {
