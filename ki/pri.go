@@ -30,3 +30,15 @@ func (pri PRI) Sign(message string) (string, *errors.Error) {
 	}
 	return hexutil.Encode(signStr), nil
 }
+
+func (pri PRI) GetPUB() (ADR, PUB, *errors.Error) {
+	privateKey, nErr := crypto.HexToECDSA(pri.S()[2:])
+	if nErr != nil {
+		logger.Logger.Error("crypto.HexToECDSA(pri.S())", zap.Error(nErr))
+		return "", "", errors.Sys("crypto.HexToECDSA error: " + nErr.Error())
+	}
+	addrStr := crypto.PubkeyToAddress(privateKey.PublicKey).Hex()
+	pubBytes := crypto.FromECDSAPub(&privateKey.PublicKey)
+	pubKeyStr := hexutil.Encode(pubBytes)
+	return ADR(addrStr), PUB(pubKeyStr), nil
+}

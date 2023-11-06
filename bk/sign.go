@@ -2,6 +2,7 @@ package bk
 
 import (
 	"github.com/hootuu/tome/ki"
+	"github.com/hootuu/utils/crypto"
 	"github.com/hootuu/utils/errors"
 	"sort"
 )
@@ -47,6 +48,11 @@ func (b *SignBuilder) Build() string {
 	}
 
 	return content
+}
+
+func (b *SignBuilder) Hash() string {
+	content := b.Build()
+	return crypto.SHA256(content)
 }
 
 func (b *SignBuilder) Sign(privateKey ki.PRI) (string, *errors.Error) {
