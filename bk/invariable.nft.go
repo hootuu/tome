@@ -67,7 +67,7 @@ func (i *InvariableNFT) getSignBuilder() *SignBuilder {
 		metaStr = string(metaBytes)
 	}
 	return NewSignBuilder().
-		Add("type", i.Type).
+		Add("type", i.Type.S()).
 		Add("version", i.Version.S()).
 		Add("vn", i.Vn.S()).
 		Add("category", i.Category.S()).

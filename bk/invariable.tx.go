@@ -54,7 +54,7 @@ func NewInvariableTx(
 
 func (i *InvariableTx) getSignBuilder() *SignBuilder {
 	return NewSignBuilder().
-		Add("type", i.Type).
+		Add("type", i.Type.S()).
 		Add("version", i.Version.S()).
 		Add("tx", i.Tx).
 		Add("coin", i.Coin.S()).

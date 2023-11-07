@@ -51,7 +51,7 @@ func NewTie(chain Chain, invariable Invariable, vnGuardianPri ki.PRI) (*Tie, *er
 
 func (i *Tie) getSignBuilder() *SignBuilder {
 	return NewSignBuilder().
-		Add("type", i.Type).
+		Add("type", i.Type.S()).
 		Add("version", i.Version.S()).
 		Add("vn", i.Vn.S()).
 		Add("chain", i.Chain.S()).

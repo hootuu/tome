@@ -43,4 +43,6 @@ type Alter struct {
 	Coin         Code         `bson:"coin" json:"coin"`
 	Amount       *Amount      `bson:"amount" json:"amount"`
 	Yin          yn.YID       `bson:"yin" json:"yin"`
+	//Summary      string       `bson:"summary" json:"summary"`
+	Timestamp string `bson:"timestamp" json:"timestamp"`
 }

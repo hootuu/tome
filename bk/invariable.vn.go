@@ -49,7 +49,7 @@ func NewInvariableVN(originBID BID, vnID vn.ID, guardian *ki.Ki, tag []Tag) (*In
 
 func (i *InvariableVN) getSignBuilder() *SignBuilder {
 	return NewSignBuilder().
-		Add("type", i.Type).
+		Add("type", i.Type.S()).
 		Add("version", i.Version.S()).
 		Add("vn", i.Vn.S()).
 		Add("guardian", i.Guardian.ToString()).

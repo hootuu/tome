@@ -76,28 +76,37 @@ func NewAmountFloat64(wei WEI, fVal float64) (*Amount, *errors.Error) {
 }
 
 func (a *Amount) Dec(decAmount *Amount) *Amount {
-	return a.Inc(&Amount{
-		Wei:   decAmount.Wei,
-		Left:  0 - decAmount.Left,
-		Right: 0 - decAmount.Right,
-	})
+	decF := float64(decAmount.Left) + float64(a.Right)*math.Pow10(0-int(a.Wei))
+	defA, _ := NewAmountFloat64(a.Wei, 0-decF)
+	return a.Inc(defA)
 }
 
 func (a *Amount) Inc(incAmount *Amount) *Amount {
-	willLeft := a.Left + incAmount.Left
-	willRight := a.Right + incAmount.Right
-	willRightStr := fmt.Sprintf("%d", willRight)
-	if len(willRightStr) > int(a.Wei) {
-		willLeft += 1
-		for i := len(willRightStr); i < int(a.Wei); i++ {
-			willRightStr += "0"
-		}
-		willRight, _ = strconv.ParseInt(willRightStr, 10, 64)
-	}
-	pureIncAmount, _ := NewAmount(a.Wei, willLeft-a.Left, willRight-a.Right)
-	a.Left = willLeft
-	a.Right = willRight
-	return pureIncAmount
+	originF := float64(a.Left) + float64(a.Right)*math.Pow10(0-int(a.Wei))
+	totalF := float64(a.Left) +
+		float64(incAmount.Left) +
+		float64(a.Right)*math.Pow10(0-int(a.Wei)) +
+		float64(incAmount.Right)*math.Pow10(0-int(a.Wei))
+	newAmount, _ := NewAmountFloat64(a.Wei, totalF)
+	a.Left = newAmount.Left
+	a.Right = newAmount.Right
+	incF := totalF - originF
+	incA, _ := NewAmountFloat64(a.Wei, incF)
+	return incA
+	//willLeft := a.Left + incAmount.Left
+	//willRight := a.Right + incAmount.Right
+	//willRightStr := fmt.Sprintf("%d", willRight)
+	//if len(willRightStr) > int(a.Wei) {
+	//	willLeft += 1
+	//	for i := len(willRightStr); i < int(a.Wei); i++ {
+	//		willRightStr += "0"
+	//	}
+	//	willRight, _ = strconv.ParseInt(willRightStr, 10, 64)
+	//}
+	//pureIncAmount, _ := NewAmount(a.Wei, willLeft-a.Left, willRight-a.Right)
+	//a.Left = willLeft
+	//a.Right = willRight
+	//return pureIncAmount
 }
 
 func (a *Amount) Lte(b *Amount) bool {

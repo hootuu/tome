@@ -52,7 +52,7 @@ func NewInvariableSP(vnLead *VNLead, spID sp.ID, guardian *ki.Ki, tag []Tag) (*I
 
 func (i *InvariableSP) getSignBuilder() *SignBuilder {
 	return NewSignBuilder().
-		Add("type", i.Type).
+		Add("type", i.Type.S()).
 		Add("version", i.Version.S()).
 		Add("vn", i.Vn.S()).
 		Add("sp", i.Sp.S()).

@@ -67,7 +67,7 @@ func NewInvariableYin(yin *yn.Yin, vnLead *VNLead, spLead *SPLead, vnGuardianPri
 
 func (i *InvariableYin) getSignBuilder() *SignBuilder {
 	return NewSignBuilder().
-		Add("type", i.Type).
+		Add("type", i.Type.S()).
 		Add("version", i.Version.S()).
 		Add("vn", i.Vn.S()).
 		Add("sp", i.Sp.S()).

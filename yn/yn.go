@@ -2,13 +2,12 @@ package yn
 
 import (
 	"fmt"
-	"github.com/hootuu/tome/bk"
 	"github.com/hootuu/tome/sp"
 	"github.com/hootuu/tome/vn"
 	"github.com/hootuu/utils/errors"
 )
 
-type YID = bk.BID
+type YID = string
 
 type Yin struct {
 	Yin   Code     `bson:"yin" json:"yin"`
@@ -24,8 +23,8 @@ type Yin struct {
 	Ctx   Ctx      `bson:"ctx" json:"ctx"`
 }
 
-func (y *Yin) GetType() bk.Type {
-	return bk.Type("YIN")
+func (y *Yin) GetType() string {
+	return "YIN"
 }
 
 func (y *Yin) GetVN() vn.ID {
@@ -34,6 +33,10 @@ func (y *Yin) GetVN() vn.ID {
 
 func (y *Yin) GetSP() sp.ID {
 	return y.Sp
+}
+
+func (y *Yin) Summary() string {
+	return fmt.Sprintf("%s %s Exp[%s%d]", y.Who.Ref.Ref, y.Act, y.Exp.Currency, y.Exp.Amount)
 }
 
 func NewYin(vnIDStr string, spIDStr string) (*Yin, *errors.Error) {

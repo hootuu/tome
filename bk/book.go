@@ -14,11 +14,11 @@ const (
 )
 
 func (t Type) S() string {
-	return t
+	return string(t)
 }
 
 func TypeVerify(t Type) *errors.Error {
-	matched, _ := regexp.MatchString(`^[a-zA-Z0-9_.]{1,100}$`, t)
+	matched, _ := regexp.MatchString(`^[a-zA-Z0-9_.]{1,100}$`, t.S())
 	if !matched {
 		return errors.Verify(fmt.Sprintf("invalid bk.type: %s", t))
 	}
