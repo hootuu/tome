@@ -61,3 +61,11 @@ func (m Value) Add(keyStr string, val int64) *errors.Error {
 	m[key] = val
 	return nil
 }
+
+func (m Value) Get(key Key) int64 {
+	v, ok := m[key]
+	if !ok {
+		return 0
+	}
+	return v
+}

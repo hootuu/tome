@@ -4,9 +4,19 @@ import (
 	"fmt"
 	"github.com/hootuu/tome/vn"
 	"github.com/hootuu/tome/yn"
+	"github.com/hootuu/utils/errors"
+	"regexp"
 )
 
 type Chain string
+
+func (c Chain) Verify() *errors.Error {
+	matched, _ := regexp.MatchString(`^[a-zA-Z0-9._]{1,200}$`, c.S())
+	if !matched {
+		return errors.Verify(fmt.Sprintf("invalid chain: %s", c.S()))
+	}
+	return nil
+}
 
 func (c Chain) S() string {
 	return string(c)
