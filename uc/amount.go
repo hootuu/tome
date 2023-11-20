@@ -81,6 +81,11 @@ func (a *Amount) Dec(decAmount *Amount) *Amount {
 	return a.Inc(defA)
 }
 
+func (a *Amount) Float64() float64 {
+	f := float64(a.Left) + float64(a.Right)*math.Pow10(0-int(a.Wei))
+	return f
+}
+
 func (a *Amount) Inc(incAmount *Amount) *Amount {
 	originF := float64(a.Left) + float64(a.Right)*math.Pow10(0-int(a.Wei))
 	totalF := float64(a.Left) +

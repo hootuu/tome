@@ -3,10 +3,13 @@ package nft
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/hootuu/tome/bk/bid"
 	"github.com/hootuu/tome/vn"
 	"github.com/hootuu/utils/errors"
 	"regexp"
 )
+
+type NID = bid.BID
 
 type Link = string
 type Tag = string
@@ -15,6 +18,18 @@ func TagVerify(t Tag) *errors.Error {
 	matched, _ := regexp.MatchString(`^[a-zA-Z0-9._]{3,256}$`, t)
 	if !matched {
 		return errors.Verify(fmt.Sprintf("invalid nft.Tag(^[a-zA-Z0-9._]{3,256}$): %s", t))
+	}
+	return nil
+}
+
+func TagArrVerify(arr []Tag) *errors.Error {
+	if len(arr) == 0 {
+		return nil
+	}
+	for _, t := range arr {
+		if err := TagVerify(t); err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -89,6 +104,11 @@ type NFT struct {
 	Title       string   `bson:"title" json:"title,omitempty"`
 	Description string   `bson:"desc" json:"desc,omitempty"`
 	Meta        Meta     `bson:"meta" json:"meta,omitempty"`
+}
+
+type Wrap struct {
+	NID NID  `bson:"nid" json:"nid"`
+	NFT *NFT `bson:"nft" json:"nft"`
 }
 
 func (m *NFT) Verify() *errors.Error {

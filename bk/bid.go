@@ -1,9 +1,8 @@
 package bk
 
 import (
+	"github.com/hootuu/tome/bk/bkhelper"
 	"github.com/hootuu/utils/errors"
-	cbor "github.com/ipfs/go-ipld-cbor"
-	"github.com/multiformats/go-multihash"
 )
 
 type BID string
@@ -18,9 +17,9 @@ func (b BID) S() string {
 }
 
 func BuildBID(data Invariable) (BID, *errors.Error) {
-	node, nErr := cbor.WrapObject(data, multihash.SHA2_256, -1)
-	if nErr != nil {
-		return NilBID, errors.Sys("wrap cbor node failed: " + nErr.Error())
+	bidStr, err := bkhelper.BuildBID(data)
+	if err != nil {
+		return NilBID, err
 	}
-	return BID(node.Cid().String()), nil
+	return BID(bidStr), nil
 }
