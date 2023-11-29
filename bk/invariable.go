@@ -20,7 +20,7 @@ type InvariableLead struct {
 }
 
 func (lead *InvariableLead) S() string {
-	return fmt.Sprintf("type=%s;version=%s;invariable=%s", lead.Type, lead.Version, lead.Invariable)
+	return fmt.Sprintf("type=%s;version=%d;invariable=%s", lead.Type, lead.Version, lead.Invariable)
 }
 
 type InvariableTemplate struct {

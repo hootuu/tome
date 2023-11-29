@@ -11,6 +11,13 @@ import (
 	"strings"
 )
 
+const (
+	ErrDifferentWei      = "Different Wei"
+	ErrNumericalOverflow = "Numerical Overflow"
+	ErrDivisorLteZero    = "The Divisor Is Less Than Or Equal To Zero"
+	ErrMultiplierLtZero  = "The Multiplier Is Less Than Zero"
+)
+
 type Du struct {
 	W Wei   `bson:"w" json:"w"`
 	N bool  `bson:"n" json:"n"` //negative
@@ -160,39 +167,39 @@ func (d Du) Compare(other Du) int {
 
 func (d Du) Add(other Du) (Du, *errors.Error) {
 	if other.W != d.W {
-		return Du{}, errors.Verify("It is not allowed to add two values of different WEI")
-	}
-	if other.L > math.MaxInt64-d.L {
-		return Du{}, errors.Verify("Numerical overflow")
+		return Du{}, errors.Verify(ErrDifferentWei)
 	}
 	return fromBigInt(d.W,
 		new(big.Int).Add(
 			d.toBigInt(),
 			other.toBigInt(),
-		)), nil
+		))
 }
 
 func (d Du) Subtract(other Du) (Du, *errors.Error) {
 	if other.W != d.W {
-		return Du{}, errors.Verify("It is not allowed to subtract two values of different WEI")
-	}
-	if d.L < math.MinInt64+other.L {
-		return Du{}, errors.Verify("Numerical overflow")
+		return Du{}, errors.Verify(ErrDifferentWei)
 	}
 	return fromBigInt(d.W,
 		new(big.Int).Sub(
 			d.toBigInt(),
 			other.toBigInt(),
-		)), nil
+		))
 }
 
 func (d Du) Multiply(mul int64) (Du, *errors.Error) {
+	if mul < 0 {
+		return Du{}, errors.Verify(ErrMultiplierLtZero)
+	}
 	return fromBigInt(d.W, new(big.Int).Mul(
 		d.toBigInt(), big.NewInt(mul),
-	)), nil
+	))
 }
 
 func (d Du) MultiplyF(mul float64) (Du, *errors.Error) {
+	if mul < 0 {
+		return Du{}, errors.Verify(ErrMultiplierLtZero)
+	}
 	mulF := new(big.Float).Mul(big.NewFloat(mul), d.W.PowF())
 	mulI, acy := mulF.Int(nil)
 	if acy != big.Exact {
@@ -202,18 +209,30 @@ func (d Du) MultiplyF(mul float64) (Du, *errors.Error) {
 		new(big.Int).Mul(
 			d.toBigInt(),
 			mulI,
-		), d.W.Pow())), nil
+		), d.W.Pow()))
 }
 
 func (d Du) Divide(div int64) (Du, *errors.Error) {
-	return fromBigInt(d.W, new(big.Int).Div(d.toBigInt(), big.NewInt(div))), nil
+	if div <= 0 {
+		return Du{}, errors.Verify(ErrDivisorLteZero)
+	}
+	quotient := new(big.Int)
+	remainder := new(big.Int)
+	quotient, remainder = quotient.DivMod(d.toBigInt(), big.NewInt(div), remainder)
+	if remainder.Cmp(new(big.Int).Div(new(big.Int).Abs(big.NewInt(div)), big.NewInt(2))) > 0 {
+		quotient = quotient.Add(quotient, big.NewInt(1))
+	}
+	return fromBigInt(d.W, quotient)
 }
 
 func (d Du) DivideF(div float64) (Du, *errors.Error) {
+	if div < 0 || math.Abs(div) < 1e-18 {
+		return Du{}, errors.Verify(ErrDivisorLteZero)
+	}
 	divF := new(big.Float).Mul(big.NewFloat(div), d.W.PowF())
 	divI, acy := divF.Int(nil)
 	if acy != big.Exact {
-		return Du{}, errors.Verify("Numerical overflow")
+		return Du{}, errors.Verify(ErrNumericalOverflow)
 	}
 	return fromBigInt(d.W,
 		new(big.Int).Div(
@@ -222,7 +241,7 @@ func (d Du) DivideF(div float64) (Du, *errors.Error) {
 				d.W.Pow(),
 			),
 			divI,
-		)), nil
+		))
 }
 
 func (d Du) doGetR() string {
@@ -256,17 +275,20 @@ func (d Du) toBigInt() *big.Int {
 	return t
 }
 
-func fromBigInt(w Wei, bi *big.Int) Du {
+func fromBigInt(w Wei, bi *big.Int) (Du, *errors.Error) {
 	wp := w.Pow()
 	xbi := new(big.Int).Abs(bi)
 	nL := new(big.Int).Div(xbi, wp)
 	nR := new(big.Int).Mod(xbi, wp)
+	if !nL.IsInt64() || !nR.IsInt64() {
+		return Du{}, errors.Verify(ErrNumericalOverflow)
+	}
 	return Du{
 		W: w,
 		N: bi.Cmp(big.NewInt(0)) < 0,
 		L: nL.Int64(),
 		R: nR.Int64(),
-	}
+	}, nil
 
 }
 

@@ -5,28 +5,15 @@ import (
 	"github.com/hootuu/utils/errors"
 	"math"
 	"math/big"
-	"regexp"
 )
-
-type Code string
-
-func (c Code) S() string {
-	return string(c)
-}
-
-func CodeVerify(cStr string) *errors.Error {
-	matched, _ := regexp.MatchString("^[0-9a-zA-Z]{1,200}$", cStr)
-	if !matched {
-		return errors.Verify(fmt.Sprintf("invalid coin code: %s", cStr))
-	}
-	return nil
-}
 
 type Wei uint8
 
 const (
-	MaxWei     Wei = 28
-	DefaultWei Wei = 10
+	MaxWei     Wei = 18
+	DefaultWei Wei = 2
+
+	ErrWeiInvalid = "Invalid Wei: 0 <= wei <= 18"
 )
 
 func (w Wei) S() string {
@@ -51,7 +38,7 @@ func (w Wei) Get(f float64) int64 {
 
 func WeiVerify(wei Wei) *errors.Error {
 	if wei < 0 || wei > MaxWei {
-		return errors.Verify("invalid wei: [0, " + MaxWei.S() + "]")
+		return errors.Verify(ErrWeiInvalid)
 	}
 	return nil
 }

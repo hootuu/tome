@@ -27,7 +27,7 @@ func (c Ctx) Put(code string, val string) *errors.Error {
 func CtxToData(c Ctx) ([]byte, *errors.Error) {
 	if len(c) == 0 {
 		c = NewCtx()
-		c.Put("hotu", "I USE HOTU TO BUILD MY VALUABLE BUSINESS NETWORK")
+		_ = c.Put("hotu", "I USE HOTU TO BUILD MY VALUABLE BUSINESS NETWORK")
 	}
 	b, nErr := json.Marshal(c)
 	if nErr != nil {

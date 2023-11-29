@@ -3,6 +3,7 @@ package du
 import (
 	"fmt"
 	"github.com/hootuu/utils/errors"
+	"math"
 	"reflect"
 	"testing"
 )
@@ -22,6 +23,24 @@ func TestDu_Add(t *testing.T) {
 		wantErr *errors.Error
 	}{
 		{
+			name: "999+98",
+			fields: struct {
+				self Du
+			}{self: FromInt64(10, 999)},
+			args:    struct{ other Du }{other: FromInt64(10, 98)},
+			want:    FromInt64(10, 999+98),
+			wantErr: nil,
+		},
+		{
+			name: "999+0.98",
+			fields: struct {
+				self Du
+			}{self: FromInt64(10, 999)},
+			args:    struct{ other Du }{other: FromFloat64(10, 0.98)},
+			want:    FromFloat64(10, 999+0.98),
+			wantErr: nil,
+		},
+		{
 			name: "1.1+1.1",
 			fields: struct {
 				self Du
@@ -38,6 +57,31 @@ func TestDu_Add(t *testing.T) {
 			args:    struct{ other Du }{other: FromFloat64(10, 1.9)},
 			want:    FromFloat64(10, 3.1),
 			wantErr: nil,
+		},
+		{
+			name: "-1.9+1.2",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, 1.2)},
+			args:    struct{ other Du }{other: FromFloat64(10, -1.9)},
+			want:    FromFloat64(10, -1.9+1.2),
+			wantErr: nil,
+		},
+		{
+			name: "Max+Max",
+			fields: struct {
+				self Du
+			}{self: FromInt64(10, math.MaxInt64)},
+			args:    struct{ other Du }{other: FromInt64(10, math.MaxInt64)},
+			wantErr: errors.Verify(ErrNumericalOverflow),
+		},
+		{
+			name: "Min+Min",
+			fields: struct {
+				self Du
+			}{self: FromInt64(10, math.MinInt64)},
+			args:    struct{ other Du }{other: FromInt64(10, math.MinInt64)},
+			wantErr: errors.Verify(ErrNumericalOverflow),
 		},
 	}
 	for _, tt := range tests {
@@ -69,6 +113,24 @@ func TestDu_Divide(t *testing.T) {
 		wantErr *errors.Error
 	}{
 		{
+			name: "99999/3",
+			fields: struct {
+				self Du
+			}{self: FromInt64(10, 99999)},
+			args:    struct{ div int64 }{div: 3},
+			want:    FromInt64(10, 99999/3),
+			wantErr: nil,
+		},
+		{
+			name: "99999/7",
+			fields: struct {
+				self Du
+			}{self: FromInt64(10, 99999)},
+			args:    struct{ div int64 }{div: 7},
+			want:    MustFromString("+10:14285.5714285714"),
+			wantErr: nil,
+		},
+		{
 			name: "1.1/1",
 			fields: struct {
 				self Du
@@ -78,21 +140,48 @@ func TestDu_Divide(t *testing.T) {
 			wantErr: nil,
 		},
 		{
+			name: "9.9/4",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, 9.9)},
+			args:    struct{ div int64 }{div: 4},
+			want:    FromFloat64(10, 9.9/4),
+			wantErr: nil,
+		},
+		{
 			name: "1.9/3",
 			fields: struct {
 				self Du
-			}{self: FromFloat64(10, 1.9)},
+			}{self: MustFromString("+10:1.9")},
 			args:    struct{ div int64 }{div: 3},
-			want:    FromFloat64(10, 0.6333333333),
+			want:    FromFloat64(10, 1.9/3),
 			wantErr: nil,
 		},
 		{
 			name: "-1.9/3",
 			fields: struct {
 				self Du
-			}{self: FromFloat64(10, -1.9)},
+			}{self: MustFromString("-10:1.9")},
 			args:    struct{ div int64 }{div: 3},
-			want:    MustFromString("-10:0.6333333334"),
+			want:    FromFloat64(10, -1.9/3),
+			wantErr: nil,
+		},
+		{
+			name: "-1111.99999/3",
+			fields: struct {
+				self Du
+			}{self: MustFromString("-10:1111.99999")},
+			args:    struct{ div int64 }{div: 3},
+			want:    FromFloat64(10, -1111.99999/3),
+			wantErr: nil,
+		},
+		{
+			name: "1111.99999/3",
+			fields: struct {
+				self Du
+			}{self: MustFromString("+10:1111.99999")},
+			args:    struct{ div int64 }{div: 3},
+			want:    FromFloat64(10, 1111.99999/3),
 			wantErr: nil,
 		},
 		{
@@ -110,7 +199,7 @@ func TestDu_Divide(t *testing.T) {
 				self Du
 			}{self: FromFloat64(10, 9.89)},
 			args:    struct{ div int64 }{div: 3},
-			want:    MustFromString("+10:3.2966666666"),
+			want:    FromFloat64(10, 9.89/3),
 			wantErr: nil,
 		},
 		{
@@ -121,6 +210,22 @@ func TestDu_Divide(t *testing.T) {
 			args:    struct{ div int64 }{div: 3},
 			want:    FromFloat64(10, -9.89/3),
 			wantErr: nil,
+		},
+		{
+			name: "-9.89/-3",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, -9.89)},
+			args:    struct{ div int64 }{div: -3},
+			wantErr: errors.Verify(ErrDivisorLteZero),
+		},
+		{
+			name: "9.89/-3",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, 9.89)},
+			args:    struct{ div int64 }{div: -3},
+			wantErr: errors.Verify(ErrDivisorLteZero),
 		},
 	}
 	for _, tt := range tests {
@@ -168,6 +273,39 @@ func TestDu_DivideF(t *testing.T) {
 			args:    struct{ div float64 }{div: 3.2},
 			want:    FromFloat64(10, 1.9/3.2),
 			wantErr: nil,
+		},
+		{
+			name: "-1.9/3.2",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, -1.9)},
+			args:    struct{ div float64 }{div: 3.2},
+			want:    FromFloat64(10, -1.9/3.2),
+			wantErr: nil,
+		},
+		{
+			name: "-1.9/0",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, -1.9)},
+			args:    struct{ div float64 }{div: 0},
+			wantErr: errors.Verify(ErrDivisorLteZero),
+		},
+		{
+			name: "-1.9/-3.2",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, -1.9)},
+			args:    struct{ div float64 }{div: -3.2},
+			wantErr: errors.Verify(ErrDivisorLteZero),
+		},
+		{
+			name: "1.9/-3.2",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, 1.9)},
+			args:    struct{ div float64 }{div: -3.2},
+			wantErr: errors.Verify(ErrDivisorLteZero),
 		},
 	}
 	for _, tt := range tests {
@@ -236,6 +374,40 @@ func TestDu_Multiply(t *testing.T) {
 			}{self: FromFloat64(10, -1.9)},
 			args:    struct{ mul int64 }{mul: 9},
 			want:    FromFloat64(10, -1.9*9),
+			wantErr: nil,
+		},
+		{
+			name: "MAXx100",
+			fields: struct {
+				self Du
+			}{self: FromInt64(10, math.MaxInt64)},
+			args:    struct{ mul int64 }{mul: 100},
+			wantErr: errors.Verify(ErrNumericalOverflow),
+		},
+		{
+			name: "1.9x0",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, 1.9)},
+			args:    struct{ mul int64 }{mul: 0},
+			want:    FromFloat64(10, 0),
+			wantErr: nil,
+		},
+		{
+			name: "1.9x-9",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, 1.9)},
+			args:    struct{ mul int64 }{mul: -9},
+			wantErr: errors.Verify(ErrMultiplierLtZero),
+		},
+		{
+			name: "-1.9x0",
+			fields: struct {
+				self Du
+			}{self: FromFloat64(10, -1.9)},
+			args:    struct{ mul int64 }{mul: 0},
+			want:    FromFloat64(10, 0),
 			wantErr: nil,
 		},
 	}
@@ -376,7 +548,12 @@ func TestFromByte(t *testing.T) {
 		want  Du
 		want1 *errors.Error
 	}{
-		// TODO: Add test cases.
+		{
+			name:  "+18:0.999",
+			args:  args{bArr: []byte("+18:0.999")},
+			want:  MustFromString("+18:0.999"),
+			want1: nil,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

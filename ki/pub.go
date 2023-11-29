@@ -23,8 +23,8 @@ func (pub PUB) VerifySignature(message string, signStr string) (bool, *errors.Er
 	msgBytes := []byte(message)
 	signBytes, nErr := hexutil.Decode(signStr)
 	if nErr != nil {
-		logger.Logger.Error("hexutil.Decode(signStr) failed", zap.Error(nErr))
-		return false, errors.Sys("hexutil.Decode(signStr) failed: " + nErr.Error())
+		logger.Logger.Error("hex-util.Decode(signStr) failed", zap.Error(nErr))
+		return false, errors.Sys("hex-util.Decode(signStr) failed: " + nErr.Error())
 	}
 
 	hash := crypto.Keccak256Hash(msgBytes)
